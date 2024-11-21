@@ -74,20 +74,28 @@ def get_db_data(delta_t='Today'):
 # Add some spacing
 ''
 ''
+''
+''
 
 options = ['Today', 'Last 24 hours', 'Last 7 days', 'Last 30 days', 'Last 90 days', 'Last year']
 delta_t = st.segmented_control(
     "a", options, selection_mode="single", default=['Today'], label_visibility='collapsed'
 )
 
-
 df = pd.DataFrame(get_db_data(delta_t))
 
+''
+''
 
 filter_cities = st.multiselect(
     "Filter cities",
     df.city.dropna().unique()
 )
+
+''
+''
+''
+''
 
 if filter_cities:
     dff = df[['uat','city']].loc[df.city.isin(filter_cities)].copy()
@@ -108,9 +116,6 @@ df.insert(0, 'date', df.pop('date'))
 # df = df[front_cols + back_cols]
 # st.dataframe(df, hide_index=True)
 
-''
-''
-
 
 dfg = df.copy()
 if delta_t in ['Today', 'Last 24 hours', 'Last 7 days']:
@@ -122,6 +127,10 @@ df_users = dfg[['date_str','uat']].drop_duplicates(keep='first').groupby(['date_
 
 dfg['Events'] = 1
 df_events = dfg[['date_str','Events']].groupby(['date_str']).sum()
+
+unique_visitors = str(df_users.uat.sum())
+total_events = str(df_events.Events.sum())
+
 
 df_events = pd.concat([df_users, df_events], axis=1)
 df_events.rename(columns={'uat':'Unique Visitors'}, inplace=True)
@@ -138,9 +147,20 @@ st.bar_chart(df_events, height=450)
 
 ''
 ''
-''
-''
 
+col1, col2, col3 = st.columns(3, gap='large')
+with col1:
+    st.subheader('Unique Visitors')
+    st.subheader(unique_visitors)
+
+with col2:
+    st.subheader('Events')
+    st.subheader(total_events)
+
+''
+''
+''
+''
 
 col1, col2, col3 = st.columns(3, gap='large')
 with col1:
