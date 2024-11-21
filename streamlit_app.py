@@ -68,7 +68,7 @@ def get_db_data(delta_t='Today'):
 
 # Set the title that appears at the top of the page.
 '''
-# Visu Analytics :earth_americas: 
+# :earth_americas: Visu Analytics
 '''
 
 # Add some spacing
