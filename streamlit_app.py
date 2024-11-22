@@ -354,6 +354,7 @@ if token:
         url_params = dfs.urlParams.dropna().unique()
         st.write('URL Params:', str(url_params) or 'None')
         dfs = dfs.drop(columns=['saidi','referrer','urlParams'])
+        dfs.date = dfs.date.dt.strftime('%b. %d, %Y %H:%M:%S')
         st.dataframe(dfs, hide_index=True)
 
 ''
