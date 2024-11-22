@@ -128,9 +128,6 @@ df_users = dfg[['date_str','uat']].drop_duplicates(keep='first').groupby(['date_
 dfg['Events'] = 1
 df_events = dfg[['date_str','Events']].groupby(['date_str']).sum()
 
-unique_visitors = str(df_users.uat.sum())
-total_events = str(df_events.Events.sum())
-
 
 df_events = pd.concat([df_users, df_events], axis=1)
 df_events.rename(columns={'uat':'Unique Visitors'}, inplace=True)
@@ -148,6 +145,8 @@ st.bar_chart(df_events, height=450)
 ''
 ''
 
+unique_visitors = len(df.uat.unique())
+total_events = len(df)
 col1, col2, col3 = st.columns(3, gap='large')
 with col1:
     st.subheader('Unique Visitors')
@@ -270,7 +269,8 @@ dfg['count'] = 1
 dfg = dfg.groupby([
     'country','region','city'
 ]).count().sort_values(by='count', ascending=False)
-st.dataframe(dfg)
+dfg.reset_index(inplace=True)
+st.dataframe(dfg, hide_index=True)
 
 ''
 ''
@@ -281,7 +281,8 @@ dfg['count'] = 1
 dfg = dfg.groupby([
     'uat','country','region','city'
 ]).count().sort_values(by='count', ascending=False)
-st.dataframe(dfg)
+dfg.reset_index(inplace=True)
+st.dataframe(dfg, hide_index=True)
 
 ''
 ''
@@ -326,7 +327,7 @@ dff = df[['uat','country','region','city','deviceType']].dropna().reset_index(dr
 dff = dff.drop_duplicates()
 dfsc = pd.DataFrame(df.uat.value_counts()).reset_index()
 dfsc = dfsc.merge(dff, how='left', on='uat')
-dfsc = dfsc[['uat','count','country','region','city','deviceType']]
+dfsc = dfsc[['uat','country','region','city','deviceType','count']]
 st.dataframe(dfsc, hide_index=True)
 
 
@@ -375,7 +376,14 @@ if n_sessions > 0:
             st.write(f'Session ID:')
         with col2:
             st.write(sess)
-        dfs = df.loc[df.saidi == sess].sort_values(by='createdAt', ascending=True)[cols]
+        dfs = df.loc[df.saidi == sess].sort_values(by='createdAt', ascending=True).copy()
+        uat = dfs.uat.dropna().unique()[0]
+        dfs = dfs[cols].copy()
+        col1, col2 = st.columns([2, 10], gap='small')
+        with col1:
+            st.write(f'UAT:')
+        with col2:
+            st.write(uat)
         dfs.fillna('EMPTY', inplace=True)
         dfs.set_index('date', inplace=True)
         for i, row in enumerate(dfs.itertuples(index=False)):
@@ -387,4 +395,5 @@ if n_sessions > 0:
             with col2:
                 for k, v in row.items():
                     st.write(f'**{k}**: \u0020\u0020 {v}')
+            st.write('')
         st.write('---')
