@@ -348,12 +348,17 @@ if token:
         st.subheader(f'Session {i+1}')
         dfs = dfu.loc[dfu.saidi == sess].copy()
         dfs.dropna(axis=1, how='all', inplace=True)
-        referrers = dfs.referrer.dropna().unique()
-        referrers = ', '.join(referrers)
-        st.write('Referrers:', referrers or 'None')
-        url_params = dfs.urlParams.dropna().unique()
-        st.write('URL Params:', str(url_params) or 'None')
-        dfs = dfs.drop(columns=['saidi','referrer','urlParams'])
+        if 'referrer' in dfs.columns:
+            referrers = dfs.referrer.dropna().unique()
+            referrers = ', '.join(referrers)
+            st.write('Referrers:', referrers or 'None')
+        if 'urlParams' in dfs.columns:
+            url_params = dfs.urlParams.dropna().unique()
+            st.write('URL Params:', str(url_params) or 'None')
+        cols_to_use = ['saidi','referrer','urlParams']
+        cols = [i for i in cols_to_use if i in dfs.columns]
+        if len(cols) > 0:
+            dfs = dfs.drop(columns=['saidi','referrer','urlParams'])
         dfs.date = dfs.date.dt.strftime('%b. %d, %Y %H:%M:%S')
         st.dataframe(dfs, hide_index=True)
 
@@ -368,7 +373,7 @@ if n_sessions > 0:
     sessions = df.saidi.drop_duplicates(keep='first').to_list()[:n_sessions]
     cols_to_use = [
         'date', 'pageView', 'urlParams', 'country', 'city', 'region', 'deviceType', 'referrer', 'dashLayout',
-        'readMoreClick', 'articleClick', 'pingClick', 'miniChartClick', 'filingClick', 'fundTab'
+        'readMoreClick', 'articleClick', 'pingClick', 'miniChartClick', 'filingClick', 'fundTab', 'dashDropdownChange',
     ]
     cols = [i for i in cols_to_use if i in df.columns]
     for sess in sessions:
