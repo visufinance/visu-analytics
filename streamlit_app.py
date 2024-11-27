@@ -81,8 +81,10 @@ options = ['Today', 'Last 24 hours', 'Last 7 days', 'Last 30 days', 'Last 90 day
 delta_t = st.segmented_control(
     "a", options, selection_mode="single", default=['Today'], label_visibility='collapsed'
 )
-
-df = pd.DataFrame(get_db_data(delta_t))
+if delta_t:
+    df = pd.DataFrame(get_db_data(delta_t))
+else:
+    st.stop()
 
 ''
 ''
@@ -210,9 +212,9 @@ with col1:
     st.subheader(str(metric))
 
 with col2:
-    st.subheader("Article Clicks")
-    if 'articleClick' in df.columns:
-        metric = df['articleClick'].value_counts().sum()
+    st.subheader("Dash Dropdown Change")
+    if 'dashDropdownChange' in df.columns:
+        metric = df['dashDropdownChange'].value_counts().sum()
     else:
         metric = 0
     st.subheader(str(metric))
@@ -224,7 +226,6 @@ with col3:
     else:
         metric = 0
     st.subheader(str(metric))
-
 
 ''
 ''
@@ -248,14 +249,29 @@ with col2:
         metric = 0
     st.subheader(str(metric))
 
-with col3:
+
+''
+''
+''
+''
+
+
+col1, col2, col3 = st.columns(3, gap='large')
+with col1:
+    st.subheader("Article Clicks")
+    if 'articleClick' in df.columns:
+        metric = df['articleClick'].value_counts().sum()
+    else:
+        metric = 0
+    st.subheader(str(metric))
+
+with col2:
     st.subheader("News Type")
     if 'newsType' in df.columns:
         metric = df['newsType'].value_counts()
     else:
         metric = 0
     st.write(metric)
-
 
 ''
 ''
