@@ -34,7 +34,7 @@ def convert_seconds(seconds):
     return ', '.join(result)
 
 
-@st.cache_data(ttl='0')
+@st.cache_data(ttl='120')
 def get_db_data(delta_t='Today'):
     if delta_t == 'Today':
         start_date = pd.Timestamp('now', tz='America/New_York').replace(hour=0, minute=0, second=0, microsecond=0)
