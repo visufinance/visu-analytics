@@ -34,7 +34,7 @@ def convert_seconds(seconds):
     return ', '.join(result)
 
 
-@st.cache_data(ttl='120')
+@st.cache_data(ttl='0')
 def get_db_data(delta_t='Today'):
     if delta_t == 'Today':
         start_date = pd.Timestamp('now', tz='America/New_York').replace(hour=0, minute=0, second=0, microsecond=0)
@@ -85,6 +85,10 @@ if delta_t:
     df = pd.DataFrame(get_db_data(delta_t))
 else:
     st.stop()
+
+
+# st.dataframe(df)
+
 
 ''
 ''
@@ -212,9 +216,9 @@ with col1:
     st.subheader(str(metric))
 
 with col2:
-    st.subheader("Dash Dropdown Change")
-    if 'dashDropdownChange' in df.columns:
-        metric = df['dashDropdownChange'].value_counts().sum()
+    st.subheader("Article Clicks")
+    if 'articleClick' in df.columns:
+        metric = df['articleClick'].value_counts().sum()
     else:
         metric = 0
     st.subheader(str(metric))
@@ -242,6 +246,14 @@ with col1:
     st.subheader(str(metric))
 
 with col2:
+    st.subheader("Dash Dropdown Change")
+    if 'dashDropdownChange' in df.columns:
+        metric = df['dashDropdownChange'].value_counts().sum()
+    else:
+        metric = 0
+    st.subheader(str(metric))
+
+with col3:
     st.subheader("Fundamentals Scroll")
     if 'fundTab' in df.columns:
         metric = df['fundTab'].value_counts().sum()
@@ -254,16 +266,20 @@ with col2:
 ''
 ''
 ''
+''
+''
 
 
-col1, col2, col3 = st.columns(3, gap='large')
+col1, col2 = st.columns(2, gap='large')
 with col1:
-    st.subheader("Article Clicks")
-    if 'articleClick' in df.columns:
-        metric = df['articleClick'].value_counts().sum()
+    st.subheader("Errors")
+    if 'errorFile' in df.columns:
+        dff = df.loc[df.errorFile.notnull()].copy()
+        dff['errorStr'] = dff['errorFile'] + ' --- ' + dff['url']
+        metric = dff['errorStr'].value_counts()
+        st.dataframe(metric)
     else:
-        metric = 0
-    st.subheader(str(metric))
+        st.subheader(0)
 
 with col2:
     st.subheader("News Type")
